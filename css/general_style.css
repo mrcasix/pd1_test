@@ -1,0 +1,218 @@
+
+* {
+	margin:0px;
+	padding:0px;
+}
+html,body,#contenitore{
+	height:100%;
+}
+body {
+	font-family: Helvetica, Arial, sans-serif;
+} 
+#parte_centrale {
+	position:relative;
+	height:100%;
+	width: 100%;
+	display: table;
+}
+#intestazione {
+	position:relative;
+	width: 100%;
+	background-color: #20B2AA;
+	color: #fff;
+	text-align: center;
+	padding: 3em 0px;
+}
+#intestazione > a {
+	color: #fff;
+	text-decoration: none;
+	font-size: 15pt;
+}
+#barra_laterale {
+	position:relative;
+	width: 15%;
+	height: 100%;
+	float:left;
+	background-color: #778899;
+	text-align:center;
+	overflow: auto;
+}
+#barra_laterale li {
+	padding: 20px 0px;
+	border-bottom: solid 1px #fff;
+}
+#barra_laterale li:first {
+	border-top: solid 1px #fff;
+}
+#barra_laterale li:hover{
+	background-color:#5b6875
+}
+#barra_laterale a {
+	color: #fff;
+	text-decoration: none;
+	font-size: 15pt;
+}
+#contenuto {
+	position:relative;
+	height: 100%;
+	width: 75%;
+	float:left;
+}
+.success_button {
+	background-color:#00ff00;
+	color:#fff;
+	padding:4px;
+}
+.danger_button {
+	background-color:#ff0000;
+	color:#fff;
+	padding:4px;
+}
+.blank_button {
+	background-color:#ddd;
+	color:#fff;
+	padding:4px;
+}
+.obbligo_compilazione{
+	border : solid 2px #f00; 
+}
+.alert_panel{
+	margin:40px;
+	padding: 20px;
+	text-align:center;
+	background-color:#ce7783;
+	color:#822c37;
+}
+.top_panel{
+	padding: 20px;
+	text-align:center;
+}
+.titolo_articolo,.intestazione_blocco{
+	padding: 20px;
+}
+.blocco_immagine{
+	margin:20px;padding: 20px;
+	position:relative;
+	display:inline-block;
+}
+.top_immagine{
+	margin-top:20px;
+}
+.immagine{
+	float:left;
+	padding-right:30px;
+	margin-top:-40px;
+	width:"300px";
+	height:"300px";
+}
+.blocco_main{
+	margin:20px;
+}
+.top_commenti{
+	margin-top:20px;
+	padding-left:10px;
+}
+.top_commenti{
+	padding-left:10px;
+}
+.blocco_commenti{
+	width: 450px; 
+	margin-top: 30px;
+	margin-left:20px;
+	padding-bottom: 40px;
+	border-bottom: dashed #949292 1px;
+}
+.blocco_commenti:last-of-type{
+	
+	margin-bottom:50px;
+	
+}
+.punteggio{
+	margin-top:10px;
+	
+}.floating_left{
+	float:left;
+	
+}
+.testo_commento{
+	display: inline-block;
+}
+.testo_commento textarea{
+	margin-top:10px; 
+	resize: none;
+}
+.autore{
+	margin-top:10px;
+}
+.blocco_giudizio{
+	float:left;
+}
+.print_giudizio{
+	float:right;
+	line-height:2;
+	font-style: italic;
+	font-size: small;
+}
+.nuovo_commento{
+	margin-top:20px;
+	width:420px;
+	padding-left:20px;
+}
+.lbl_comment{
+	margin-top:10px;
+}
+.span_button{
+	display: block;
+	text-align: right;
+	margin-top:10px;
+}
+.primary_button{
+	background-color:#20B2AA;
+	color:#fff;
+	padding:10px;
+}
+.centeredDiv { 
+  width:400px;
+  position: absolute !important;
+  top: 25%;
+  left: 35%;
+  transform: -webkit-translate(-50%, -50%);
+  transform: -ms-translate(-50%, -50%);
+}
+.divRegistrazione { 
+  width:400px;
+  position: absolute !important;
+  top: 10%;
+  left: 35%;
+  transform: -webkit-translate(-50%, -50%);
+  transform: -ms-translate(-50%, -50%);
+}
+.form_label { 
+ 
+    margin-right: 40px;
+
+}.full_width { 
+ 
+   width:100%;
+
+}
+.comment_button { 
+ 
+   padding-top: 10px;
+   
+
+}
+.comment_button  button{ 
+ 
+       height: 25px;
+    text-align: center;
+    padding: 0px 4px 0px 4px;
+
+}
+.alert_below{ 
+	color:red;
+	font-size:12px;
+	font-style:italic;
+}
+
+	
