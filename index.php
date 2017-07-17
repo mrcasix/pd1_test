@@ -29,33 +29,45 @@ if ($session->isValid()) {
 		?>
 		
 		<div id = 'contenuto'>
-			<div style="padding: 20px;">
-				<h2>Elenco prenotazioni :</h2> 
-				<hr/>
+			<?php if(!isset($_SESSION['logged'])){ ?>	
+			<div class="success_panel">
+				Benvenuto in <?php echo __NOME_SITO__ ?>,il sito web per la gestione delle consulenze.
+ Per poter effetturare una prenotazione  &egrave; necessario <a href="<?php echo __LINK_SITO__?>registrati.php">registrarsi</a> oppure effettuare il <a href="<?php echo __LINK_SITO__?>login.php">login</a>.
 			</div>
-			<?php 
+
+			<?php } ?>
+		<?php 
 				
-				$query = "SELECT * from prenotazioni p,utenti u where p.fk_id_utente=u.id_utente";
+				$query = "SELECT * from prenotazioni p,utenti u,orario_prenotazioni o where p.fk_id_utente=u.id_utente and o.id_orario_prenotazioni=p.fk_id_orario_prenotazione";
 				$res = mysqli_query($db_conn,$query) or die("Errore nella query: " . mysqli_error($db_conn));
 			 
 
 			?>
 			
-				<div style="margin:20px;padding: 20px;border: dashed 1px #ddd;height:180px;overflow: auto">
+				<div class="panel_reservation">
 			<?php 	
-				while ($row = mysqli_fetch_array($res)) {
+				
+				if(mysqli_num_rows($res)>0){
 			?>
-					<div style="margin-top:20px;">
+					<div style="margin-top:20px;margin-left:20px;">
 					
-					
-						<table>
+						<h3 class="pre_text" >Prenotazioni</h3>
+						<table id="elenco_prenotazioni">
 							<tr>
-								<td><?php echo $row["cognome"]." ".$row["nome"] ?></td>	
+								<th>Nominativo</th>
+								<th>Fascia oraria</th>
+								<th>Durata</th>
+							</tr>
+							<?php  while($row = mysqli_fetch_array($res, MYSQLI_ASSOC)){ ?>
+							<tr>
+								<td><?php echo $row["cognome"]." ".$row["nome"] ?></td>
+								<td><?php echo $row["ora_inizio"]." - ".$row["ora_fine"]  ?></td>
 								<td><?php echo $row["durata"]  ?></td>
 							</tr>
+							<?php } ?>
 						</table>
 					</div>
-			<?php }  ?>
+			<?php   }  ?>
 
 				</div>
 		</div>
