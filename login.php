@@ -1,5 +1,8 @@
 <?php 
 	include 'includes.php';
+	
+
+	
 	if(isset($_POST['logga'])){
 		$mail=$_POST['mail'];
 		$password= $_POST['password'];
@@ -9,20 +12,13 @@
 			$_SESSION['ultima_attivita']=time();
 			$_SESSION['id_utente']=$dati['id_utente'];
 			header("Location: http://".__LINK_INTERO_SITO__);
+
 		}
 	}
 	
-	
-
-?>
-
-<?php
-
-if(isset($_SESSION["logged"])){
-     header("location:".__LINK_SITO__);
-}
-
-
+	if(isset($_SESSION["logged"])){
+     		header("location:".__LINK_SITO__);
+	}
 
 ?>
 

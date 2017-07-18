@@ -1,12 +1,16 @@
 <?php
 
 include 'includes.php';
-/*
-$session = new Session();
-if ($session->isValid()) {
-    redirect ("book.php");
+
+
+if(isset($_POST['send_form'])){
+	
+	die("inviato");
+	$id_utente=$_SESSION["id_utente"];
+	$durata=$_POST["durata"];
+	save_prenotazione($id_utente,$durata);
 }
-*/
+
 
 
 ?>
@@ -30,10 +34,48 @@ if ($session->isValid()) {
 		
 		<div id = 'contenuto'>
 			<?php if(!isset($_SESSION['logged'])){ ?>	
+			
 			<div class="success_panel">
 				Benvenuto in <?php echo __NOME_SITO__ ?>,il sito web per la gestione delle consulenze.
  Per poter effetturare una prenotazione  &egrave; necessario <a href="<?php echo __LINK_SITO__?>registrati.php">registrarsi</a> oppure effettuare il <a href="<?php echo __LINK_SITO__?>login.php">login</a>.
 			</div>
+			
+			<?php } else {
+				$prenotazioni = get_prenotazioni($_SESSION['id_utente']);
+			?>
+			<form method="POST" action="<?php echo $_SERVER["PHP_SELF"] ?>">			
+				<h3 class="pre_text" >Effettua una prenotazione:</h3>
+				<div class="input_durata">
+					<input  type="text" placeholder="Inserire durata" name="durata" value=""/> 
+
+
+					<input type="submit" name="send_form" value="Invia"/>
+
+				</div>
+			</form>	
+		
+
+		
+				<h3 class="pre_text" >La tua prenotazioni</h3>
+		
+				<table id="elenco_prenotazioni">
+					<tr>
+						<th>Fascia oraria</th>
+						<th>Durata</th>
+						<th>#</th>
+					</tr>
+					<?php 
+					foreach($prenotazioni as $index=>$values){
+?>
+
+						<td>1</td>
+						<td>2</td>
+						<td>3</td>
+
+<?php					
+}
+					?>
+				</table>
 
 			<?php } ?>
 		<?php 
@@ -52,7 +94,7 @@ if ($session->isValid()) {
 					<div style="margin-top:20px;margin-left:20px;">
 					
 						<h3 class="pre_text" >Prenotazioni</h3>
-						<table id="elenco_prenotazioni">
+							<table id="elenco_prenotazioni">
 							<tr>
 								<th>Nominativo</th>
 								<th>Fascia oraria</th>
@@ -66,6 +108,8 @@ if ($session->isValid()) {
 							</tr>
 							<?php } ?>
 						</table>
+					
+			
 					</div>
 			<?php   }  ?>
 

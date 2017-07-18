@@ -113,7 +113,7 @@ function controlla_login($mail,$password){
 	if(!isset($dati['password'])){
 		return array("esito"=>false);
 	}
-	else if(md5($password)!=$dati['password']){
+	else if(hash('sha512',$password)!=$dati['password']){
 		return array("esito"=>false);
 	}
 	else {
@@ -121,6 +121,7 @@ function controlla_login($mail,$password){
 		return $dati;
 	}
 }
+
 function crea_utente($nome,$cognome,$mail,$password,$ripassword){
 	global $db_conn;
 	$mail = mysqli_real_escape_string($db_conn, $mail);
@@ -152,6 +153,27 @@ function mail_gia_usata($mail){
 	}
 	return false;
 	
+}
+function get_prenotazioni($id_utente){
+	global $db_conn;
+	$id_utente = mysqli_real_escape_string($db_conn, $id_utente);
+	$query = "SELECT * prenotazioni WHERE fk_id_utente=".$id_utente;
+	
+	$res = mysqli_query($db_conn,$query);
+	
+	if(!$res) return array();
+	return get_result_to_array($res,true);
+}
+
+function save_prenotazione($id_utente,$durata){
+	global $db_conn;
+	$id_utente = mysqli_real_escape_string($db_conn, $id_utente);
+;
+	$durata = mysqli_real_escape_string($db_conn, $durata);
+	$query = "INSERT INTO prenotazioni(fk_id_utente,durata,fk_id_orario_prenotazione) VALUES ($id_utente,$durata)";
+die($query);	
+	$res = mysqli_query($db_conn,$query);
+			
 }
 
 ?>
