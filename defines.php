@@ -9,4 +9,5 @@
 	define ('__PWD_DB__', '');
 	define ('__DURATA_SESSIONE__', '1');
 	define ('__FASCIA_ORARIA_PREDEFINITA__','1');
+	
 ?>

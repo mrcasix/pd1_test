@@ -2,7 +2,9 @@
 
 include 'includes.php';
 
+//die(var_dump($_POST));
 
+/*
 if(isset($_POST['send_form'])){
 	
 	die("inviato");
@@ -10,7 +12,7 @@ if(isset($_POST['send_form'])){
 	$durata=$_POST["durata"];
 	save_prenotazione($id_utente,$durata);
 }
-
+*/
 
 
 ?>
@@ -43,8 +45,12 @@ if(isset($_POST['send_form'])){
 			<?php } else {
 				$prenotazioni = get_prenotazioni($_SESSION['id_utente']);
 			?>
-			<form method="POST" action="<?php echo $_SERVER["PHP_SELF"] ?>">			
-				<h3 class="pre_text" >Effettua una prenotazione:</h3>
+			<form method="POST" action="<?php echo $_SERVER["PHP_SELF"] ?>?controlla_cookies" onsubmit="return check_prenotazione(); " >			
+			
+	<input type="hidden" name="action" value="save_prenotazione"/>
+
+	<?php if(count($prenotazioni)==0){?>
+	<h3 class="pre_text" >Effettua una prenotazione:</h3>
 				<div class="input_durata">
 					<input  type="text" placeholder="Inserire durata" name="durata" value=""/> 
 
@@ -55,30 +61,50 @@ if(isset($_POST['send_form'])){
 			</form>	
 		
 
-		
+	<?php } else { ?>	
 				<h3 class="pre_text" >La tua prenotazioni</h3>
-		
 				<table id="elenco_prenotazioni">
+
 					<tr>
 						<th>Fascia oraria</th>
 						<th>Durata</th>
 						<th>#</th>
 					</tr>
-					<?php 
+					<?php
+
+					
+ 
 					foreach($prenotazioni as $index=>$values){
+
 ?>
+					<tr>
+						<td><?php echo $values["ora_inizio"]." ".$values["ora_fine"] ?></td>
+						<td><?php echo $values["durata"] ?></td>
+	
+<td>
 
-						<td>1</td>
-						<td>2</td>
-						<td>3</td>
-
+	<form name="elimina_prenotazione_<?php echo $values["id_prenotazione"] ?>" method="POST" action="<?php echo $_SERVER["PHP_SELF"]?>?controlla_cookies" onsubmit="return pre_sending(); ">
+<!--
+	<a href="javascript:document.forms['elimina_prenotazione_<?php echo $values["id_prenotazione"] ?>'].submit()" class="elimina_prenotazione" >Elimina</a>
+-->
+	<input type="hidden" name="action" value="delete_prenotazione"/>	
+	<input type="hidden" name="id_prenotazione" value="<?php echo $values["id_prenotazione"] ?>" />
+	<button type="submit">Elimina</button>
+	
+	</form>
+</td>
+					</tr>
 <?php					
 }
 					?>
 				</table>
 
-			<?php } ?>
-		<?php 
+			<?php } 
+		}
+          ?>
+
+
+	<?php 
 				
 				$query = "SELECT * from prenotazioni p,utenti u,orario_prenotazioni o where p.fk_id_utente=u.id_utente and o.id_orario_prenotazioni=p.fk_id_orario_prenotazione";
 				$res = mysqli_query($db_conn,$query) or die("Errore nella query: " . mysqli_error($db_conn));
@@ -118,5 +144,32 @@ if(isset($_POST['send_form'])){
         </div>
 	
     </div>
-  </body>
+  <script>
+
+	function pre_sending() {
+		
+
+		if(confirm("Sei sicuro di voler eliminare la prenotazione ?")){
+			return true;	
+		} else {
+			return false;
+		}
+
+		
+	}
+	
+	function check_prenotazione(){
+		var durata = parseInt($("").val());
+  
+		if(durata>180 || durata<=0){
+			alert("Inserire un valore corretto (1-180)");
+			return false;
+		}
+	}
+
+
+  </script>
+
+
+    </body>
 </html>

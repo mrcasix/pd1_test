@@ -154,26 +154,104 @@ function mail_gia_usata($mail){
 	return false;
 	
 }
-function get_prenotazioni($id_utente){
+function get_prenotazioni($id_utente=NULL){
 	global $db_conn;
 	$id_utente = mysqli_real_escape_string($db_conn, $id_utente);
-	$query = "SELECT * prenotazioni WHERE fk_id_utente=".$id_utente;
+	$query = "SELECT * FROM prenotazioni p,utenti u,orario_prenotazioni o where p.fk_id_utente=u.id_utente and o.id_orario_prenotazioni=p.fk_id_orario_prenotazione";
+
+	if($id_utente!=NULL)
+ 		$query.=" and p.fk_id_utente=".$id_utente;
+
 	
 	$res = mysqli_query($db_conn,$query);
 	
 	if(!$res) return array();
-	return get_result_to_array($res,true);
+	return get_result_to_array($res,false);
 }
 
-function save_prenotazione($id_utente,$durata){
+
+function get_orario($id_orario=__FASCIA_ORARIA_PREDEFINITA__){
 	global $db_conn;
-	$id_utente = mysqli_real_escape_string($db_conn, $id_utente);
 ;
-	$durata = mysqli_real_escape_string($db_conn, $durata);
-	$query = "INSERT INTO prenotazioni(fk_id_utente,durata,fk_id_orario_prenotazione) VALUES ($id_utente,$durata)";
-die($query);	
+	$query = "SELECT * FROM orario_prenotazioni where id_orario_prenotazioni=".$id_orario;
 	$res = mysqli_query($db_conn,$query);
-			
+
+	if(!$res) return array();
+	return get_result_to_array($res,true);
+	
 }
+
+function totale_prenotazione(){
+	global $db_conn;
+;
+	$query = "SELECT sum(durata_assegnata) FROM prenotazioni";
+	$res = mysqli_query($db_conn,$query);
+
+	if(!$res) return array();
+	return get_result_to_array($res,true);
+	
+}
+
+
+function prenotazioni_richieste(){
+	global $db_conn;
+;
+	$query = "SELECT id_prenotazione,durata_richiesta FROM prenotazioni order by id_prenotazione DESC";
+	$res = mysqli_query($db_conn,$query);
+
+	if(!$res) return array();
+	return get_result_to_array($res,false);
+	
+}
+
+
+
+
+function save_prenotazione(){
+	
+;
+	global $db_conn;
+	$id_utente = mysqli_real_escape_string($db_conn, $_SESSION['id_utente']);
+
+	$orario = get_orario();
+	$totale_precedente = totale_prenotazione();
+	$elenco_richieste = prenotazioni_richieste();
+	if($totale_precedente<180){
+
+
+;
+	$durata = mysqli_real_escape_string($db_conn, $_POST['durata']);
+
+	
+	$nuove_durate=array();
+	
+	if($totale_precedente+$durata>180){
+		$totale = $totale_precendente+$durata;
+		for($i=0;$i<count($elenco_richieste);$i++){
+			$nuove_durate[$i] = $elenco_richieste[$i]*$totale/180;
+		}	
+	}
+
+
+
+	$query = "INSERT INTO prenotazioni(fk_id_utente,durata,fk_id_orario_prenotazione) VALUES ($id_utente,$durata,".__FASCIA_ORARIA_PREDEFINITA__.")";
+	$res = mysqli_query($db_conn,$query);
+	
+
+
+	}
+}
+
+function delete_prenotazione(){
+	global $db_conn;
+	$id_utente = mysqli_real_escape_string($db_conn, $_SESSION['id_utente']);
+;
+	$id_prenotazione = mysqli_real_escape_string($db_conn, $_POST['id_prenotazione']);
+	$query = "DELETE FROM prenotazioni WHERE fk_id_utente=$id_utente AND id_prenotazione=$id_prenotazione";
+
+	mysqli_query($db_conn,$query);
+	
+}
+
 
 ?>
