@@ -133,7 +133,7 @@ function crea_utente($nome,$cognome,$mail,$password,$ripassword){
 	$mail = mysqli_real_escape_string($db_conn, $mail);
 	$nome = mysqli_real_escape_string($db_conn, $mail);
 	$cognome = mysqli_real_escape_string($db_conn, $mail);
-	$password = md5($password);
+	$password = hash('sha512',$password);
 	$query = "INSERT INTO utenti (nome,cognome,mail,password)
 	  	  values(\"$nome\",\"$cognome\",\"$mail\",\"$password\")";
 	
@@ -150,9 +150,8 @@ function mail_gia_usata($mail){
 	global $db_conn;
 	$mail = mysqli_real_escape_string($db_conn, $mail);
 	$query = "SELECT count(*) as conteggio from utenti where utenti.mail = \"$mail\"";
-	
 	$res = mysqli_query($db_conn,$query);
-	if(!$res) return array("esito"=>false);
+	if(!$res) return false;
 	$dati = get_result_to_array($res,true);
 	if($dati["conteggio"] > 0) { 
 		return true;
@@ -168,6 +167,8 @@ function get_prenotazioni($id_utente=NULL){
 	if($id_utente!=NULL)
  		$query.=" and p.fk_id_utente=".$id_utente;
 
+
+ 	$query.=" order by p.ora_inizio_prenotazione";
 	
 	$res = mysqli_query($db_conn,$query);
 	

@@ -2,19 +2,6 @@
 
 include 'includes.php';
 
-//die(var_dump($_POST));
-
-/*
-if(isset($_POST['send_form'])){
-	
-	die("inviato");
-	$id_utente=$_SESSION["id_utente"];
-	$durata=$_POST["durata"];
-	save_prenotazione($id_utente,$durata);
-}
-*/
-
-
 ?>
 
 <!doctype html>
@@ -45,11 +32,16 @@ if(isset($_POST['send_form'])){
 			<?php } else {
 				$prenotazioni = get_prenotazioni($_SESSION['id_utente']);
 			?>
+
+
+<?php if(count($prenotazioni)==0){?>
+	
+
+
 			<form method="POST" action="<?php echo $_SERVER["PHP_SELF"] ?>?controlla_cookies" onsubmit="return check_prenotazione(); " >			
 			
 	<input type="hidden" name="action" value="save_prenotazione"/>
 
-	<?php if(count($prenotazioni)==0){?>
 	<h3 class="pre_text" >Effettua una prenotazione:</h3>
 				<div class="input_durata">
 					<input type="text" placeholder="Inserire durata" id="durata" name="durata" value=""/> 
@@ -86,18 +78,16 @@ if(isset($_POST['send_form'])){
 						<td>
 
 							<form name="elimina_prenotazione_<?php echo $values["id_prenotazione"] ?>" method="POST" action="<?php echo $_SERVER["PHP_SELF"]?>?controlla_cookies" onsubmit="return pre_sending(); ">
-						<!--
-							<a href="javascript:document.forms['elimina_prenotazione_<?php echo $values["id_prenotazione"] ?>'].submit()" class="elimina_prenotazione" >Elimina</a>
-						-->
-							<input type="hidden" name="action" value="delete_prenotazione"/>	
-							<input type="hidden" name="id_prenotazione" value="<?php echo $values["id_prenotazione"] ?>" />
-							<button type="submit">Elimina</button>
+					
+								<input type="hidden" name="action" value="delete_prenotazione"/>	
+								<input type="hidden" name="id_prenotazione" value="<?php echo $values["id_prenotazione"] ?>" />
+								<button type="submit">Elimina</button>
 							
 							</form>
 						</td>
 					</tr>
-<?php					
-}
+					<?php					
+						}
 					?>
 				</table>
 
@@ -106,11 +96,7 @@ if(isset($_POST['send_form'])){
           ?>
 
 
-	<?php 
-			/*	
-				$query = "SELECT * from prenotazioni p,utenti u,orario_prenotazioni o where p.fk_id_utente=u.id_utente and o.id_orario_prenotazioni=p.fk_id_orario_prenotazione";
-				$res = mysqli_query($db_conn,$query) or die("Errore nella query: " . mysqli_error($db_conn));
-			*/
+			<?php 
 				$prenotazioni = get_prenotazioni();
 			?>
 			
@@ -163,15 +149,15 @@ if(isset($_POST['send_form'])){
 	}
 	
 	function check_prenotazione(){
-		var durata = $("#durata").val();
+		var durata = parseFloat($("#durata").val());
 
-
-  		if(!Number.isInteger(durata)){
+		
+  		if(isNaN($("#durata").val()) || !Number.isInteger(durata)){
   			alert("Inserire un numero intero.");
 			return false;
   		}
 		else if(durata>180 || durata<=0){
-			alert("Inserire un valore corretto (1-180)");
+			alert("Inserire un valore corretto (1-180).");
 			return false;
 		}
 	}

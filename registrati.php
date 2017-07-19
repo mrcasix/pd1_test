@@ -12,31 +12,31 @@
 		
 		if (filter_var($mail, FILTER_VALIDATE_EMAIL) === false || mail_gia_usata($mail)) {
 		   $mail_valida=false;
-		} 
 		
-		$below_pwd="";
-		if (filter_var($mail, FILTER_VALIDATE_EMAIL) === false)
-			$below_mail="Mail non valida";
-		else 
-			$below_mail="Mail già in uso";
 		
-		if($mail_valida && strlen($password)>0 && $password===$ripassword){
-			$dati=crea_utente($mail,$password,$cognome,$password,$ripassword);
+			$below_pwd="";
+			if (filter_var($mail, FILTER_VALIDATE_EMAIL) === false)
+				$below_mail="Mail non valida";
+			else
+				$below_mail="Mail già in uso";
 		}
-		
-		
-		
 		else {
-			$below_pwd="Inserire due password uguali";
-		}
-		
-		
-		
-		if(isset($dati) && $dati['esito']===true){
-			$_SESSION['logged']=1;
-			$_SESSION['ultima_attivita']=time();
-			$_SESSION['id_utente']=$dati['id_utente'];
-			header("Location: http://".__LINK_INTERO_SITO__);
+			if($mail_valida && strlen($password)>0 && $password===$ripassword){
+				$dati=crea_utente($mail,$password,$cognome,$password,$ripassword);
+			}
+			else {
+				$below_pwd="Inserire due password uguali";
+			}
+			
+			
+			
+			if(isset($dati) && $dati['esito']===true){
+				$_SESSION['logged']=1;
+				$_SESSION['ultima_attivita']=time();
+				$_SESSION['id_utente']=$dati['id_utente'];
+				header("Location: http://".__LINK_INTERO_SITO__);
+			}
+
 		}
 	}
 	
