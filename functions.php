@@ -18,4 +18,11 @@ function get_result_to_array($st,$single_element=false){
 	else 
 		return $result_data;
 }
+
+function add_minute_to_hour($hour,$minutes){
+	$time = strtotime($hour);
+	$timeResult = date("H:i", strtotime('+'.$minutes.' minutes', $time));
+	return $timeResult;
+}
+
 ?>

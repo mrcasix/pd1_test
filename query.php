@@ -110,10 +110,16 @@ function controlla_login($mail,$password){
 	if(!$res) return array("esito"=>false);
 	$dati = get_result_to_array($res,true);
 	
+
+	
 	if(!isset($dati['password'])){
 		return array("esito"=>false);
 	}
 	else if(hash('sha512',$password)!=$dati['password']){
+		die(hash('sha512',$password)."<br>".$dati['password']);
+
+
+
 		return array("esito"=>false);
 	}
 	else {
@@ -184,7 +190,7 @@ function get_orario($id_orario=__FASCIA_ORARIA_PREDEFINITA__){
 function totale_prenotazione(){
 	global $db_conn;
 ;
-	$query = "SELECT sum(durata_assegnata) FROM prenotazioni";
+	$query = "SELECT IFNULL(sum(durata_assegnata),0) as totale FROM prenotazioni";
 	$res = mysqli_query($db_conn,$query);
 
 	if(!$res) return array();
@@ -196,7 +202,7 @@ function totale_prenotazione(){
 function prenotazioni_richieste(){
 	global $db_conn;
 ;
-	$query = "SELECT id_prenotazione,durata_richiesta FROM prenotazioni order by id_prenotazione DESC";
+	$query = "SELECT id_prenotazione,durata_richiesta FROM prenotazioni order by ora_inizio_prenotazione DESC";
 	$res = mysqli_query($db_conn,$query);
 
 	if(!$res) return array();
@@ -209,47 +215,109 @@ function prenotazioni_richieste(){
 
 function save_prenotazione(){
 	
-;
+
 	global $db_conn;
 	$id_utente = mysqli_real_escape_string($db_conn, $_SESSION['id_utente']);
 
 	$orario = get_orario();
-	$totale_precedente = totale_prenotazione();
-	$elenco_richieste = prenotazioni_richieste();
+	$totale_prenotazioni = totale_prenotazione();
+	$totale_precedente = (int) $totale_prenotazioni["totale"];
+	$elenco_richieste =  prenotazioni_richieste();
+	$totale_orari_inizio = array();
+	
+	
+
 	if($totale_precedente<180){
+		
+		$durata = mysqli_real_escape_string($db_conn, $_POST['durata']);
+		$nuove_durate=array();
+		
+		if($totale_precedente+$durata>180){
+			$totale = $totale_precedente+$durata;
 
+			for($i=0;$i<count($elenco_richieste);$i++){
+				$nuove_durate[$i] = round(((float) $elenco_richieste[$i]["durata_richiesta"]/$totale)*180);
+			}	
+			$nuove_durate[$i] = round(((float) $durata/$totale)*180);
+			
+			for($i=0;$i<count($elenco_richieste);$i++){
 
-;
-	$durata = mysqli_real_escape_string($db_conn, $_POST['durata']);
+				if(count($totale_orari_inizio)==0){
+					$ora_inizio = $orario["ora_inizio"];
+					$ora_fine = add_minute_to_hour($ora_inizio,$nuove_durate[$i]);
+				}
+				else {
+					$ora_inizio = array_pop((array_slice($totale_orari_inizio, -1)));
+					$ora_fine = add_minute_to_hour($ora_inizio,$nuove_durate[$i]);
+				}
 
+				$totale_orari_inizio[] = $ora_fine;
+
+				$query = "UPDATE prenotazioni SET ora_inizio_prenotazione='".$ora_inizio."',ora_fine_prenotazione='".$ora_fine."',durata_assegnata='".$nuove_durate[$i]."' WHERE id_prenotazione=".$elenco_richieste[$i]['id_prenotazione'];
+				$res = mysqli_query($db_conn,$query);
+			}
+
+			if(count($totale_orari_inizio)==0){
+				$ora_inizio = $orario["ora_inizio"];
+				$ora_fine = add_minute_to_hour($ora_inizio,$nuove_durate[$i]);
+			}
+			else {
+				$ora_inizio = array_pop((array_slice($totale_orari_inizio, -1)));
+				$ora_fine = add_minute_to_hour($ora_inizio,$nuove_durate[$i]);
+			}
+
+			$query = "INSERT INTO prenotazioni(fk_id_utente,durata_assegnata,durata_richiesta,ora_inizio_prenotazione,ora_fine_prenotazione,fk_id_orario_prenotazione) VALUES ($id_utente,$nuove_durate[$i],$durata,'$ora_inizio','$ora_fine',".__FASCIA_ORARIA_PREDEFINITA__.")";
 	
-	$nuove_durate=array();
-	
-	if($totale_precedente+$durata>180){
-		$totale = $totale_precendente+$durata;
-		for($i=0;$i<count($elenco_richieste);$i++){
-			$nuove_durate[$i] = $elenco_richieste[$i]*$totale/180;
-		}	
-	}
+			$res = mysqli_query($db_conn,$query);
+
+		}
+		else {
+
+			$totale_orari_inizio[] = $orario["ora_inizio"];
+
+			for($i=0;$i<count($elenco_richieste);$i++){
+				$totale_orari_inizio[] = add_minute_to_hour(array_pop((array_slice($totale_orari_inizio, -1))),$elenco_richieste[$i]["durata_richiesta"]);
+			}
+
+			$ora_inizio = array_pop((array_slice($totale_orari_inizio, -1)));
+			$ora_fine = add_minute_to_hour($ora_inizio,$durata);
+			
+			$query = "INSERT INTO prenotazioni(fk_id_utente,durata_assegnata,durata_richiesta,ora_inizio_prenotazione,ora_fine_prenotazione,fk_id_orario_prenotazione) VALUES ($id_utente,$durata,$durata,'".$ora_inizio."','".$ora_fine."',".__FASCIA_ORARIA_PREDEFINITA__.")";
+
+			$res = mysqli_query($db_conn,$query);
 
 
-
-	$query = "INSERT INTO prenotazioni(fk_id_utente,durata,fk_id_orario_prenotazione) VALUES ($id_utente,$durata,".__FASCIA_ORARIA_PREDEFINITA__.")";
-	$res = mysqli_query($db_conn,$query);
-	
-
-
+		}
 	}
 }
 
 function delete_prenotazione(){
 	global $db_conn;
 	$id_utente = mysqli_real_escape_string($db_conn, $_SESSION['id_utente']);
-;
+
 	$id_prenotazione = mysqli_real_escape_string($db_conn, $_POST['id_prenotazione']);
 	$query = "DELETE FROM prenotazioni WHERE fk_id_utente=$id_utente AND id_prenotazione=$id_prenotazione";
-
 	mysqli_query($db_conn,$query);
+
+
+	$orario = get_orario();
+	$elenco_richieste =  prenotazioni_richieste();
+	$totale = 0;
+
+	$totale_orari_inizio = array();
+	$totale_orari_inizio[] = $orario["ora_inizio"];
+	
+	// Riassegno le durate richieste
+
+	for($i=0;$i<count($elenco_richieste);$i++){
+
+		$ora_inizio = array_pop((array_slice($totale_orari_inizio, -1)));
+		$ora_fine = add_minute_to_hour($ora_inizio,$elenco_richieste[$i]["durata_richiesta"]);
+		$totale_orari_inizio[] = $ora_fine;	
+
+		$query = "UPDATE prenotazioni SET ora_inizio_prenotazione='".$ora_inizio."',ora_fine_prenotazione='".$ora_fine."',durata_assegnata='".$elenco_richieste[$i]["durata_richiesta"]."' WHERE id_prenotazione=".$elenco_richieste[$i]['id_prenotazione'];
+		$res = mysqli_query($db_conn,$query);
+	}	
 	
 }
 

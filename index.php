@@ -52,7 +52,7 @@ if(isset($_POST['send_form'])){
 	<?php if(count($prenotazioni)==0){?>
 	<h3 class="pre_text" >Effettua una prenotazione:</h3>
 				<div class="input_durata">
-					<input  type="text" placeholder="Inserire durata" name="durata" value=""/> 
+					<input type="text" placeholder="Inserire durata" id="durata" name="durata" value=""/> 
 
 
 					<input type="submit" name="send_form" value="Invia"/>
@@ -67,7 +67,8 @@ if(isset($_POST['send_form'])){
 
 					<tr>
 						<th>Fascia oraria</th>
-						<th>Durata</th>
+						<th>Durata richiesta</th>
+						<th>Durata assegnata</th>
 						<th>#</th>
 					</tr>
 					<?php
@@ -78,21 +79,22 @@ if(isset($_POST['send_form'])){
 
 ?>
 					<tr>
-						<td><?php echo $values["ora_inizio"]." ".$values["ora_fine"] ?></td>
-						<td><?php echo $values["durata"] ?></td>
+						<td><?php echo $values["ora_inizio_prenotazione"]." - ".$values["ora_fine_prenotazione"] ?></td>
+						<td><?php echo $values["durata_richiesta"] ?> minuti</td>
+						<td><?php echo $values["durata_assegnata"] ?> minuti</td>
 	
-<td>
+						<td>
 
-	<form name="elimina_prenotazione_<?php echo $values["id_prenotazione"] ?>" method="POST" action="<?php echo $_SERVER["PHP_SELF"]?>?controlla_cookies" onsubmit="return pre_sending(); ">
-<!--
-	<a href="javascript:document.forms['elimina_prenotazione_<?php echo $values["id_prenotazione"] ?>'].submit()" class="elimina_prenotazione" >Elimina</a>
--->
-	<input type="hidden" name="action" value="delete_prenotazione"/>	
-	<input type="hidden" name="id_prenotazione" value="<?php echo $values["id_prenotazione"] ?>" />
-	<button type="submit">Elimina</button>
-	
-	</form>
-</td>
+							<form name="elimina_prenotazione_<?php echo $values["id_prenotazione"] ?>" method="POST" action="<?php echo $_SERVER["PHP_SELF"]?>?controlla_cookies" onsubmit="return pre_sending(); ">
+						<!--
+							<a href="javascript:document.forms['elimina_prenotazione_<?php echo $values["id_prenotazione"] ?>'].submit()" class="elimina_prenotazione" >Elimina</a>
+						-->
+							<input type="hidden" name="action" value="delete_prenotazione"/>	
+							<input type="hidden" name="id_prenotazione" value="<?php echo $values["id_prenotazione"] ?>" />
+							<button type="submit">Elimina</button>
+							
+							</form>
+						</td>
 					</tr>
 <?php					
 }
@@ -105,17 +107,17 @@ if(isset($_POST['send_form'])){
 
 
 	<?php 
-				
+			/*	
 				$query = "SELECT * from prenotazioni p,utenti u,orario_prenotazioni o where p.fk_id_utente=u.id_utente and o.id_orario_prenotazioni=p.fk_id_orario_prenotazione";
 				$res = mysqli_query($db_conn,$query) or die("Errore nella query: " . mysqli_error($db_conn));
-			 
-
+			*/
+				$prenotazioni = get_prenotazioni();
 			?>
 			
 				<div class="panel_reservation">
 			<?php 	
 				
-				if(mysqli_num_rows($res)>0){
+				if(count($prenotazioni)>0){
 			?>
 					<div style="margin-top:20px;margin-left:20px;">
 					
@@ -124,13 +126,15 @@ if(isset($_POST['send_form'])){
 							<tr>
 								<th>Nominativo</th>
 								<th>Fascia oraria</th>
-								<th>Durata</th>
+								<th>Durata richiesta</th>
+								<th>Durata assegnata</th>
 							</tr>
-							<?php  while($row = mysqli_fetch_array($res, MYSQLI_ASSOC)){ ?>
+							<?php  for($i=0;$i<count($prenotazioni);$i++){ ?>
 							<tr>
-								<td><?php echo $row["cognome"]." ".$row["nome"] ?></td>
-								<td><?php echo $row["ora_inizio"]." - ".$row["ora_fine"]  ?></td>
-								<td><?php echo $row["durata"]  ?></td>
+								<td><?php echo $prenotazioni[$i]["nome"]." ".$prenotazioni[$i]["cognome"] ?></td>
+								<td><?php echo $prenotazioni[$i]["ora_inizio_prenotazione"]." - ".$prenotazioni[$i]["ora_fine_prenotazione"]  ?></td>
+								<td><?php echo $prenotazioni[$i]["durata_richiesta"]  ?> minuti</td>
+								<td><?php echo $prenotazioni[$i]["durata_assegnata"]  ?> minuti</td>
 							</tr>
 							<?php } ?>
 						</table>
@@ -159,9 +163,14 @@ if(isset($_POST['send_form'])){
 	}
 	
 	function check_prenotazione(){
-		var durata = parseInt($("").val());
-  
-		if(durata>180 || durata<=0){
+		var durata = $("#durata").val();
+
+
+  		if(!Number.isInteger(durata)){
+  			alert("Inserire un numero intero.");
+			return false;
+  		}
+		else if(durata>180 || durata<=0){
 			alert("Inserire un valore corretto (1-180)");
 			return false;
 		}
